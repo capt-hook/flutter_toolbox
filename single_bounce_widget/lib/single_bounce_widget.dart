@@ -54,7 +54,7 @@ class _SingleBounceWidgetState extends State<SingleBounceWidget>
     if (widget.reset && !oldWidget.reset) {
       _controller.reset();
       _controller.forward();
-      widget.onResetDone();
+      Future.delayed(Duration.zero, () => widget.onResetDone());
     }
   }
 
