@@ -139,7 +139,11 @@ class _SingleBounceTapWidgetState extends State<SingleBounceTapWidget> {
         widget.onTap();
       },
       child: SingleBounceWidget(
-        duration: const Duration(milliseconds: 250),
+        duration: widget.duration,
+        curve: widget.curve,
+        reverseCurve: widget.reverseCurve,
+        scaleMax: widget.scaleMax,
+        scaleMin: widget.scaleMin,
         reset: _resetBounce,
         onResetDone: () => _resetBounce = false,
         onDone: widget.onDone,
