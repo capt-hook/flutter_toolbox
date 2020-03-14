@@ -145,7 +145,11 @@ class _SingleBounceTapWidgetState extends State<SingleBounceTapWidget> {
         scaleMax: widget.scaleMax,
         scaleMin: widget.scaleMin,
         reset: _resetBounce,
-        onResetDone: () => _resetBounce = false,
+        onResetDone: () {
+          setState(() {
+            _resetBounce = false;
+          });
+        },
         onDone: widget.onDone,
         child: widget.child,
       ),
