@@ -98,3 +98,53 @@ class SingleBounceWidget extends StatefulWidget {
   @override
   _SingleBounceWidgetState createState() => _SingleBounceWidgetState();
 }
+
+class SingleBounceTapWidget extends StatefulWidget {
+  final Widget child;
+  final Duration duration;
+  final Curve curve;
+  final Curve reverseCurve;
+  final double scaleMin;
+  final double scaleMax;
+  final VoidCallback onTap;
+  final VoidCallback onDone;
+
+  SingleBounceTapWidget({
+    this.child,
+    this.duration = const Duration(milliseconds: 1000),
+    this.curve = Curves.easeOut,
+    this.reverseCurve = Curves.easeIn,
+    this.scaleMin = 1.0,
+    this.scaleMax = 0.9,
+    this.onTap,
+    this.onDone,
+  })  : assert(onTap != null),
+        assert(onDone != null);
+
+  @override
+  _SingleBounceTapWidgetState createState() => _SingleBounceTapWidgetState();
+}
+
+class _SingleBounceTapWidgetState extends State<SingleBounceTapWidget> {
+  bool _resetBounce = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        setState(() {
+          _resetBounce = true;
+        });
+        widget.onTap();
+      },
+      child: SingleBounceWidget(
+        duration: const Duration(milliseconds: 250),
+        reset: _resetBounce,
+        onResetDone: () => _resetBounce = false,
+        onDone: widget.onDone,
+        child: widget.child,
+      ),
+    );
+  }
+}
