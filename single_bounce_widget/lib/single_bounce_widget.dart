@@ -127,34 +127,41 @@ class SingleBounceTapWidget extends StatefulWidget {
 
 class _SingleBounceTapWidgetState extends State<SingleBounceTapWidget> {
   bool _resetBounce = false;
+  bool _isBouncing = false;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () {
-        if (_resetBounce) {
-          return;
-        }
-        setState(() {
-          _resetBounce = true;
-        });
-        widget.onTap();
-      },
-      child: SingleBounceWidget(
-        duration: widget.duration,
-        curve: widget.curve,
-        reverseCurve: widget.reverseCurve,
-        scaleMax: widget.scaleMax,
-        scaleMin: widget.scaleMin,
-        reset: _resetBounce,
-        onResetDone: () {
+    return IgnorePointer(
+      ignoring: _isBouncing,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
           setState(() {
-            _resetBounce = false;
+            _resetBounce = true;
+            _isBouncing = true;
           });
+          widget.onTap();
         },
-        onDone: widget.onDone,
-        child: widget.child,
+        child: SingleBounceWidget(
+          duration: widget.duration,
+          curve: widget.curve,
+          reverseCurve: widget.reverseCurve,
+          scaleMax: widget.scaleMax,
+          scaleMin: widget.scaleMin,
+          reset: _resetBounce,
+          onResetDone: () {
+            setState(() {
+              _resetBounce = false;
+            });
+          },
+          onDone: () {
+            setState(() {
+              _isBouncing = false;
+            });
+            widget.onDone();
+          },
+          child: widget.child,
+        ),
       ),
     );
   }
