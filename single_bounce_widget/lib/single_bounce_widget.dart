@@ -133,6 +133,9 @@ class _SingleBounceTapWidgetState extends State<SingleBounceTapWidget> {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
+        if (_resetBounce) {
+          return;
+        }
         setState(() {
           _resetBounce = true;
         });
