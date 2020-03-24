@@ -204,7 +204,7 @@ class SingleBounceLedByTapWidget extends StatefulWidget {
 
 class _SingleBounceLedByTapWidgetState extends State<SingleBounceLedByTapWidget>
     with SingleTickerProviderStateMixin {
-  //// Animation controller
+  /// Animation controller
   AnimationController _controller;
 
   /// View scale used in order to make the bouncing animation
@@ -228,6 +228,8 @@ class _SingleBounceLedByTapWidgetState extends State<SingleBounceLedByTapWidget>
   /// Simple getter on widget's animation duration
   Duration get duration => widget.duration;
 
+  /// If track dragging all the time it can interfere with scroll views this
+  /// widget is contained in
   bool _shouldTrackDragging = false;
 
   /// We instantiate the animation controller
@@ -261,6 +263,7 @@ class _SingleBounceLedByTapWidgetState extends State<SingleBounceLedByTapWidget>
     return GestureDetector(
       onTapDown: _onTapDown,
       onTapUp: _onTapUp,
+      onTapCancel: _onTapCancel,
       onLongPressEnd: (details) => _onLongPressEnd(details, context),
       onHorizontalDragEnd: _shouldTrackDragging ? _onDragEnd : null,
       onVerticalDragEnd: _shouldTrackDragging ? _onDragEnd : null,
@@ -302,6 +305,16 @@ class _SingleBounceLedByTapWidgetState extends State<SingleBounceLedByTapWidget>
       _controller.reverse();
     });
     _triggerOnPressed();
+  }
+
+  /// We reverse the animation
+  _onTapCancel() {
+    setState(() {
+      _shouldTrackDragging = false;
+    });
+    Future.delayed(duration, () {
+      _controller.reverse();
+    });
   }
 
   /// Here we are listening on each change when drag event is triggered
