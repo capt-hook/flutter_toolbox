@@ -14,6 +14,7 @@ class SingleBounceWidget extends StatefulWidget {
   final VoidCallback onBounceDone;
 
   SingleBounceWidget({
+    Key key,
     this.child,
     this.duration = const Duration(milliseconds: 1000),
     this.curve = Curves.easeOut,
@@ -24,7 +25,8 @@ class SingleBounceWidget extends StatefulWidget {
     @required this.onResetDone,
     this.onBounceDone,
   })  : assert(reset != null),
-        assert(onResetDone != null);
+        assert(onResetDone != null),
+        super(key: key);
 
   @override
   _SingleBounceWidgetState createState() => _SingleBounceWidgetState();
@@ -42,20 +44,20 @@ class _SingleBounceWidgetState extends State<SingleBounceWidget>
     _controller = AnimationController(
       vsync: this,
       duration: widget.duration,
-    );
-    _controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _controller.reverse();
-      }
-      if (status == AnimationStatus.dismissed) {
-        if (widget.onBounceDone != null) {
-          widget.onBounceDone();
+    )
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          _controller.reverse();
         }
-      }
-    });
-    _controller.addListener(() {
-      setState(() {});
-    });
+        if (status == AnimationStatus.dismissed) {
+          if (widget.onBounceDone != null) {
+            widget.onBounceDone();
+          }
+        }
+      })
+      ..addListener(() {
+        setState(() {});
+      });
 
     _animation = Tween(begin: widget.scaleMin, end: widget.scaleMax).animate(
       CurvedAnimation(
@@ -111,6 +113,7 @@ class SingleBounceAfterTapWidget extends StatefulWidget {
   final VoidCallback onBounceDone;
 
   SingleBounceAfterTapWidget({
+    Key key,
     this.child,
     this.duration = const Duration(milliseconds: 1000),
     this.curve = Curves.easeOut,
@@ -119,7 +122,7 @@ class SingleBounceAfterTapWidget extends StatefulWidget {
     this.scaleMax = 0.9,
     this.onTap,
     this.onBounceDone,
-  });
+  }) : super(key: key);
 
   @override
   _SingleBounceAfterTapWidgetState createState() =>
@@ -174,27 +177,23 @@ class _SingleBounceAfterTapWidgetState
 }
 
 class SingleBounceLedByTapWidget extends StatefulWidget {
-  /// Child that will receive the bouncing animation
   final Widget child;
-
-  /// Callback on click event
-  final VoidCallback onPressed;
-
-  /// Scale factor
-  ///  < 0 => the bouncing will be reversed and widget will grow
-  ///    1 => default value
-  ///  > 1 => increase the bouncing effect
-  final double scaleFactor;
-
   final Duration duration;
+  final Curve curve;
+  final Curve reverseCurve;
+  final double scaleMin;
+  final double scaleMax;
+  final VoidCallback onTap;
 
-  /// BouncingWidget constructor
-  const SingleBounceLedByTapWidget({
+  SingleBounceLedByTapWidget({
     Key key,
-    @required this.child,
-    @required this.onPressed,
-    this.scaleFactor = 1,
-    this.duration = const Duration(milliseconds: 200),
+    this.child,
+    this.duration = const Duration(milliseconds: 1000),
+    this.curve = Curves.easeOut,
+    this.reverseCurve = Curves.easeIn,
+    this.scaleMin = 1.0,
+    this.scaleMax = 0.9,
+    this.onTap,
   }) : super(key: key);
 
   @override
@@ -206,6 +205,7 @@ class _SingleBounceLedByTapWidgetState extends State<SingleBounceLedByTapWidget>
     with SingleTickerProviderStateMixin {
   /// Animation controller
   AnimationController _controller;
+  Animation _animation;
 
   /// View scale used in order to make the bouncing animation
   double _scale;
@@ -220,10 +220,7 @@ class _SingleBounceLedByTapWidgetState extends State<SingleBounceLedByTapWidget>
   Widget get child => widget.child;
 
   /// Simple getter on widget's onPressed callback
-  VoidCallback get onPressed => widget.onPressed;
-
-  /// Simple getter on widget's scaleFactor
-  double get scaleFactor => widget.scaleFactor;
+  VoidCallback get onTap => widget.onTap;
 
   /// Simple getter on widget's animation duration
   Duration get duration => widget.duration;
@@ -237,15 +234,22 @@ class _SingleBounceLedByTapWidgetState extends State<SingleBounceLedByTapWidget>
   /// value changes
   @override
   void initState() {
+    super.initState();
+
     _controller = AnimationController(
       vsync: this,
-      duration: duration,
-      lowerBound: 0.0,
-      upperBound: 0.1,
+      duration: widget.duration,
     )..addListener(() {
         setState(() {});
       });
-    super.initState();
+
+    _animation = Tween(begin: widget.scaleMin, end: widget.scaleMax).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: widget.curve,
+        reverseCurve: widget.reverseCurve,
+      ),
+    );
   }
 
   @override
@@ -259,7 +263,7 @@ class _SingleBounceLedByTapWidgetState extends State<SingleBounceLedByTapWidget>
   /// and pass it to our Transform.scale widget
   @override
   Widget build(BuildContext context) {
-    _scale = 1 - (_controller.value * scaleFactor);
+    _scale = _animation.value;
     return GestureDetector(
       onTapDown: _onTapDown,
       onTapUp: _onTapUp,
@@ -283,8 +287,8 @@ class _SingleBounceLedByTapWidgetState extends State<SingleBounceLedByTapWidget>
 
   /// Simple method called when we need to notify the user of a press event
   _triggerOnPressed() {
-    if (onPressed != null) {
-      onPressed();
+    if (onTap != null) {
+      onTap();
     }
   }
 
