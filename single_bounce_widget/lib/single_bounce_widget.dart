@@ -265,6 +265,7 @@ class _SingleBounceLedByTapWidgetState extends State<SingleBounceLedByTapWidget>
   Widget build(BuildContext context) {
     _scale = _animation.value;
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTapDown: _onTapDown,
       onTapUp: _onTapUp,
       onTapCancel: _onTapCancel,
