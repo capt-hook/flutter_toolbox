@@ -17,10 +17,9 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         body: Center(
-          child: SingleBounceTapWidget(
+          child: SingleBounceAfterTapWidget(
             duration: const Duration(milliseconds: 250),
-            onTap: () {},
-            onDone: () {
+            onBounceDone: () {
               setState(() {
                 _color = _colors[Random().nextInt(_colors.length)];
               });

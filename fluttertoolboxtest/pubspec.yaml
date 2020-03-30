@@ -30,6 +30,9 @@ dependencies:
   single_bounce_widget:
     path: ../single_bounce_widget/
 
+  cosmos:
+    path: ../cosmos/
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
