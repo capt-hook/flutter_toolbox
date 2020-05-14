@@ -239,8 +239,14 @@ class _SingleBounceLedByTapWidgetState extends State<SingleBounceLedByTapWidget>
     _controller = AnimationController(
       vsync: this,
       duration: widget.duration,
-    )..addListener(() {
+    )
+      ..addListener(() {
         setState(() {});
+      })
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          _controller.reverse();
+        }
       });
 
     _animation = Tween(begin: widget.scaleMin, end: widget.scaleMax).animate(
@@ -306,9 +312,6 @@ class _SingleBounceLedByTapWidgetState extends State<SingleBounceLedByTapWidget>
     setState(() {
       _shouldTrackDragging = false;
     });
-    Future.delayed(duration, () {
-      _controller.reverse();
-    });
     _triggerOnPressed();
   }
 
@@ -316,9 +319,6 @@ class _SingleBounceLedByTapWidgetState extends State<SingleBounceLedByTapWidget>
   _onTapCancel() {
     setState(() {
       _shouldTrackDragging = false;
-    });
-    Future.delayed(duration, () {
-      _controller.reverse();
     });
   }
 
